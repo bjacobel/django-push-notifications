@@ -20,7 +20,7 @@ class APNSDeviceSerializer(ModelSerializer):
 		# iOS device tokens are 256-bit hexadecimal (64 characters)
 
 		if HEX64_RE.match(value) is None:
-			raise ValidationError("Registration ID (device token) is not a valid hexadecimal string")
+			raise ValidationError({"message":"Registration ID (device token) is not a valid hexadecimal string"})
 		return value
 
 
