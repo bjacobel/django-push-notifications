@@ -16,12 +16,12 @@ class APNSDeviceSerializer(ModelSerializer):
 	class Meta:
 		model = APNSDevice
 
-	def validate_registration_id(self, attrs, source):
+	def validate_registration_id(self, value):
 		# iOS device tokens are 256-bit hexadecimal (64 characters)
 
-		if HEX64_RE.match(attrs[source]) is None:
-			raise ValidationError("Registration ID (device token) is invalid")
-		return attrs
+		if HEX64_RE.match(value) is None:
+			raise ValidationError("Registration ID (device token) is not a valid hexadecimal string")
+		return value
 
 
 class GCMDeviceSerializer(ModelSerializer):
