@@ -14,7 +14,7 @@ class ModelTestCase(TestCase):
 		assert device.date_created is not None
 		assert device.date_created.date() == timezone.now().date()
 
-	def test_can_create_save_device(self):
+	def test_can_save_apns_device(self):
 		device = APNSDevice.objects.create(
 			registration_id="a valid registration id"
 		)
