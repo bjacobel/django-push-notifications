@@ -92,9 +92,15 @@ class APNSDevice(Device):
 		return apns_send_message(registration_id=self.registration_id, alert=message, **kwargs)
 
 	def save(self, *args, **kwargs):
-		this_device = APNSDevice.objects.filter(device_id__exact=self.device_id)
-		if this_device.count() > 0:
-			this_device.last().save(kwargs)
+		devices_with_this_device_id = APNSDevice.objects.filter(device_id__exact=self.device_id)
+		if devices_with_this_device_id.count() > 0 and self not in devices_with_this_device_id:
+			overwrite_device = devices_with_this_device_id.last()
+			overwrite_device.name = self.name
+			overwrite_device.registration_id = self.registration_id
+			overwrite_device.user = self.user
+			overwrite_device.sandbox = self.sandbox
+			overwrite_device.active = self.active
+			overwrite_device.save()
 		else:
 			super(APNSDevice, self).save(*args, **kwargs)
 
