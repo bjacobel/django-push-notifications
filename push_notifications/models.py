@@ -91,6 +91,13 @@ class APNSDevice(Device):
 
 		return apns_send_message(registration_id=self.registration_id, alert=message, **kwargs)
 
+	def save(self, *args, **kwargs):
+		this_device = APNSDevice.objects.filter(device_id__exact=self.device_id)
+		if this_device.count() > 0:
+			this_device.last().save(kwargs)
+		else:
+			super(APNSDevice, self).save(*args, **kwargs)
+
 
 # This is an APNS-only function right now, but maybe GCM will implement it
 # in the future.  But the definition of 'expired' may not be the same. Whatevs
