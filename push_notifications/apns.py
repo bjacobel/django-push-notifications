@@ -218,7 +218,7 @@ def apns_send_bulk_message(registration_ids, alert, sandbox, **kwargs):
 	it won't be included in the notification. You will need to pass None
 	to this for silent notifications.
 	"""
-	with closing(_apns_create_socket_to_push()) as socket:
+	with closing(_apns_create_socket_to_push(sandbox=sandbox)) as socket:
 		for identifier, registration_id in enumerate(registration_ids):
 			_apns_send(registration_id, alert, sandbox=sandbox, identifier=identifier, socket=socket, **kwargs)
 		_apns_check_errors(socket)
