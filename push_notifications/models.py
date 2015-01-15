@@ -78,7 +78,7 @@ class APNSDeviceQuerySet(models.query.QuerySet):
 class APNSDevice(Device):
 	device_id = UUIDField(verbose_name=_("Device ID"), blank=True, null=True,
 		help_text="UDID / UIDevice.identifierForVendor()")
-	registration_id = models.CharField(verbose_name=_("Registration ID"), max_length=64, unique=True)
+	registration_id = models.CharField(verbose_name=_("Registration ID"), max_length=64)
 	sandbox = models.BooleanField(verbose_name=_("Use gateway.sandbox.push.apple.com?"), blank=False, null=False, default=True)
 
 	objects = APNSDeviceManager()
