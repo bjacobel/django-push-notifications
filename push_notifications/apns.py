@@ -51,8 +51,11 @@ def _apns_create_socket(address_tuple):
 	return sock
 
 
-def _apns_create_socket_to_push():
-	return _apns_create_socket((SETTINGS["APNS_HOST"], SETTINGS["APNS_PORT"]))
+def _apns_create_socket_to_push(sandbox):
+	if sandbox:
+		return _apns_create_socket(("gateway.sandbox.push.apple.com", SETTINGS["APNS_PORT"]))
+	else:
+		return _apns_create_socket(("gateway.push.apple.com", SETTINGS["APNS_PORT"]))
 
 
 def _apns_create_socket_to_feedback():
@@ -99,7 +102,7 @@ def _apns_check_errors(sock):
 		sock.settimeout(saved_timeout)
 
 
-def _apns_send(token, alert, badge=None, sound=None, category=None, content_available=False,
+def _apns_send(token, alert, sandbox=False, badge=None, sound=None, category=None, content_available=False,
 	action_loc_key=None, loc_key=None, loc_args=[], extra={}, identifier=0,
 	expiration=None, priority=10, socket=None):
 	data = {}
@@ -147,7 +150,7 @@ def _apns_send(token, alert, badge=None, sound=None, category=None, content_avai
 	if socket:
 		socket.write(frame)
 	else:
-		with closing(_apns_create_socket_to_push()) as socket:
+		with closing(_apns_create_socket_to_push(sandbox)) as socket:
 			socket.write(frame)
 			_apns_check_errors(socket)
 
@@ -191,7 +194,7 @@ def _apns_receive_feedback(socket):
 	return expired_token_list
 
 
-def apns_send_message(registration_id, alert, **kwargs):
+def apns_send_message(registration_id, alert, sandbox, **kwargs):
 	"""
 	Sends an APNS notification to a single registration_id.
 	This will send the notification as form data.
@@ -203,10 +206,10 @@ def apns_send_message(registration_id, alert, **kwargs):
 	to this for silent notifications.
 	"""
 
-	_apns_send(registration_id, alert, **kwargs)
+	_apns_send(registration_id, alert, sandbox=sandbox, **kwargs)
 
 
-def apns_send_bulk_message(registration_ids, alert, **kwargs):
+def apns_send_bulk_message(registration_ids, alert, sandbox, **kwargs):
 	"""
 	Sends an APNS notification to one or more registration_ids.
 	The registration_ids argument needs to be a list.
@@ -217,7 +220,7 @@ def apns_send_bulk_message(registration_ids, alert, **kwargs):
 	"""
 	with closing(_apns_create_socket_to_push()) as socket:
 		for identifier, registration_id in enumerate(registration_ids):
-			_apns_send(registration_id, alert, identifier=identifier, socket=socket, **kwargs)
+			_apns_send(registration_id, alert, sandbox=sandbox, identifier=identifier, socket=socket, **kwargs)
 		_apns_check_errors(socket)
 
 

@@ -72,7 +72,7 @@ class APNSDeviceQuerySet(models.query.QuerySet):
 	def send_message(self, message, **kwargs):
 		if self:
 			from .apns import apns_send_bulk_message
-			return apns_send_bulk_message(registration_ids=list(self.values_list("registration_id", flat=True)), alert=message, **kwargs)
+			return apns_send_bulk_message(registration_ids=list(self.values_list("registration_id", flat=True)), alert=message, sandbox=list(self.values_list("sandbox", flat=True))[0], **kwargs)
 
 
 class APNSDevice(Device):
@@ -89,7 +89,7 @@ class APNSDevice(Device):
 	def send_message(self, message, **kwargs):
 		from .apns import apns_send_message
 
-		return apns_send_message(registration_id=self.registration_id, alert=message, **kwargs)
+		return apns_send_message(registration_id=self.registration_id, alert=message, sandbox=self.sandbox, **kwargs)
 
 	def save(self, *args, **kwargs):
 		devices_with_this_device_id = APNSDevice.objects.filter(device_id__exact=self.device_id)
