@@ -33,10 +33,7 @@ class APNSDataOverflow(APNSError):
 
 
 def _apns_create_socket(address_tuple):
-	try:
-		certfile = django_settings.PUSH_NOTIFICATIONS_SETTINGS['APNS_CERTIFICATE']
-	except:
-		certfile = SETTINGS.get("APNS_CERTIFICATE")
+	certfile = django_settings.PUSH_NOTIFICATIONS_SETTINGS['APNS_CERTIFICATE']
 
 	if not certfile:
 		raise ImproperlyConfigured(
