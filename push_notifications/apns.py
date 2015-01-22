@@ -15,6 +15,7 @@ from django.core.exceptions import ImproperlyConfigured
 from . import NotificationError
 from .settings import PUSH_NOTIFICATIONS_SETTINGS as SETTINGS
 from django.conf import settings as django_settings
+import os
 
 
 class APNSError(NotificationError):
@@ -32,12 +33,15 @@ class APNSDataOverflow(APNSError):
 	pass
 
 
-def _apns_create_socket(address_tuple):
-	certfile = django_settings.PUSH_NOTIFICATIONS_SETTINGS['APNS_CERTIFICATE']
+def _apns_create_socket(address_tuple, sandbox=False):
+	if sandbox:
+		certfile = os.path.normpath(os.path.join(django_settings.BASE_DIR, "settings/secrets/hey_sandbox_apns.pem"))
+	else:
+		certfile = os.path.normpath(os.path.join(django_settings.BASE_DIR, "settings/secrets/hey_prod_apns.pem"))
 
 	if not certfile:
 		raise ImproperlyConfigured(
-			'You need to set PUSH_NOTIFICATIONS_SETTINGS["APNS_CERTIFICATE"] to send messages through APNS.'
+			'No certificate file set, sandbox was ' + str(sandbox)
 		)
 
 	try:
@@ -55,9 +59,9 @@ def _apns_create_socket(address_tuple):
 
 def _apns_create_socket_to_push(sandbox):
 	if sandbox:
-		return _apns_create_socket(("gateway.sandbox.push.apple.com", SETTINGS["APNS_PORT"]))
+		return _apns_create_socket(("gateway.sandbox.push.apple.com", SETTINGS["APNS_PORT"]), sandbox=True)
 	else:
-		return _apns_create_socket(("gateway.push.apple.com", SETTINGS["APNS_PORT"]))
+		return _apns_create_socket(("gateway.push.apple.com", SETTINGS["APNS_PORT"]), sandbox=False)
 
 
 def _apns_create_socket_to_feedback():
