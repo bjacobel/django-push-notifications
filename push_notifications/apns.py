@@ -14,6 +14,7 @@ from binascii import unhexlify
 from django.core.exceptions import ImproperlyConfigured
 from . import NotificationError
 from .settings import PUSH_NOTIFICATIONS_SETTINGS as SETTINGS
+from django.conf import settings as django_settings
 
 
 class APNSError(NotificationError):
@@ -32,7 +33,11 @@ class APNSDataOverflow(APNSError):
 
 
 def _apns_create_socket(address_tuple):
-	certfile = SETTINGS.get("APNS_CERTIFICATE")
+	try:
+		certfile = django_settings.PUSH_NOTIFICATIONS_SETTINGS['APNS_CERTIFICATE']
+	except:
+		certfile = SETTINGS.get("APNS_CERTIFICATE")
+
 	if not certfile:
 		raise ImproperlyConfigured(
 			'You need to set PUSH_NOTIFICATIONS_SETTINGS["APNS_CERTIFICATE"] to send messages through APNS.'
