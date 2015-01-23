@@ -12,3 +12,7 @@ build
 
 # virtualenv
 .env
+
+manage.py
+derp/*
+.tox/*

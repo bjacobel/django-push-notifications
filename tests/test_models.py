@@ -22,22 +22,6 @@ class ModelTestCase(TestCase):
 		assert device.date_created is not None
 		assert device.date_created.date() == timezone.now().date()
 
-	def test_can_save_duplicate_apns_device(self):
-		before_count = APNSDevice.objects.all().count()
-
-		APNSDevice.objects.create(
-			registration_id="a valid registration id",
-			device_id="2CA3E8AD-894F-4C04-A548-20C35CB99F45"
-		)
-		APNSDevice.objects.create(
-			registration_id="a new valid registration id",
-			device_id="2CA3E8AD-894F-4C04-A548-20C35CB99F45"
-		)
-
-		after_count = APNSDevice.objects.all().count()
-		assert after_count is before_count + 1
-
-
 	def test_gcm_send_message(self):
 		device = GCMDevice.objects.create(
 			registration_id="abc",
